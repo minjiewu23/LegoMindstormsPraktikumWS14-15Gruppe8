@@ -5,8 +5,10 @@ import lejos.nxt.Button;
 import lejos.nxt.ButtonListener;
 import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
+import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
+import lejos.robotics.navigation.RotateMoveController;
 
 
 public class SensorTests implements ButtonListener{
@@ -14,10 +16,23 @@ public class SensorTests implements ButtonListener{
 	
 	public static void main(String[] args) throws Exception {
 		SensorTests tests = new SensorTests();
-		
+		tests.rotateMotor();
 		Button.ENTER.addButtonListener(tests);
 		Button.ESCAPE.addButtonListener(tests);
 		while (!tests.buttonPressed) {
+			Thread.sleep(100);
+		}
+	}
+	
+	public void rotateMotor() throws InterruptedException {
+		while (!buttonPressed) {
+			Motor.C.rotateTo(0);
+			Thread.sleep(100);
+			Motor.C.rotateTo(90);
+			Thread.sleep(100);
+			Motor.C.rotateTo(0);
+			Thread.sleep(100);
+			Motor.C.rotateTo(-90);
 			Thread.sleep(100);
 		}
 	}

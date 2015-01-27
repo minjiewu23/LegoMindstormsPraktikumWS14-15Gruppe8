@@ -10,13 +10,12 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
+
 public class FollowLine implements ButtonListener {
-	
+
+	public static int change_arc = 10;
+
 	public static void main(String[] args) throws InterruptedException {
-		
-		Sound.setVolume(50);
-		Sound.beep();
-		
 		FollowLine followLine = new FollowLine();
 		Button.ESCAPE.addButtonListener(followLine);
 		LightSensor sensor = new LightSensor(SensorPort.S1);
@@ -25,13 +24,18 @@ public class FollowLine implements ButtonListener {
 		NXTRegulatedMotor rightMotor = Motor.B;
 		DifferentialPilot pilot = new DifferentialPilot(20, 100, leftMotor, rightMotor);
 		int maxLight = 50;
-		DriveForward forwardDriver = new DriveForward(sensor, pilot, maxLight);
-		LineLost lineLost = new LineLost(sensor, pilot, maxLight);
-		Behavior[] behaviours = {forwardDriver, lineLost};
+		Runnable scanner = new Scanner();
+
+		Runnable detector = new LineDetector(50, (Scanner) scanner);
+		((Scanner) scanner).addListener((LineDetector)detector);
+		DriveForward forwardDriver = new DriveForward(sensor, pilot, maxLight, (LineDetector) detector);
+//		LineLost lineLost = new LineLost(sensor, pilot, maxLight, (LineDetector) detector);
+		Behavior[] behaviours = {forwardDriver};
 		Arbitrator follower = new Arbitrator(behaviours, true);
-		Thread.sleep(100);
-		Sound.beep();
+		new Thread(scanner).start();
+		new Thread(detector).start();
 		follower.start();
+//		((Scanner) scanner).stopScanning();
 	}
 
 	@Override

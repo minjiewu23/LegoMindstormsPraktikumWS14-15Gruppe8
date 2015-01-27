@@ -5,7 +5,7 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.subsumption.Behavior;
 
 
-public class LineLost implements Behavior{
+public class LineLost implements Behavior, LineDetectorListener{
 
 	private LightSensor sensor;
 
@@ -13,17 +13,21 @@ public class LineLost implements Behavior{
 	
 	private int maxColorVal;
 	
-	public LineLost(LightSensor sensor, DifferentialPilot pilot, int maxColorVal) {
+	private LineDetector detector;
+	
+	public LineLost(LightSensor sensor, DifferentialPilot pilot, int maxColorVal, LineDetector detector) {
+		//(detector).setListener(this);
 		this.pilot = pilot;
 		this.sensor = sensor;
 		this.maxColorVal = maxColorVal;
+		this.detector = detector;
 	}
 
 	@Override
 	public boolean takeControl() {
-		if (sensor.getLightValue() <= maxColorVal) {
-			return true;
-		}
+//		if (this.detector.getLinePosition() > FollowLine.change_arc) {
+//			return true;
+//		}
 		return false;
 	}
 
@@ -44,5 +48,11 @@ public class LineLost implements Behavior{
 	@Override
 	public void suppress() {
 		pilot.stop();
+	}
+
+	@Override
+	public void lineFound() {
+		// TODO Auto-generated method stub
+		
 	}
 }
