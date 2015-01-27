@@ -1,37 +1,27 @@
 import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
-import lejos.nxt.Motor;
-import lejos.nxt.Sound;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.subsumption.Behavior;
 
 public class DriveForward implements Behavior, LineDetectorListener {
 
-	private LightSensor sensor;
-
 	private DifferentialPilot pilot;
-
-	private int maxColorVal;
 
 	private LineDetector detector;
 
-	private int arc = 0;
-
 	private boolean drive = true;
 	
-	private Scanner scanner;
-
 	public DriveForward(LightSensor sensor, DifferentialPilot pilot,
 			int maxColorVal, LineDetector detector) {
-		// (detector).setListener(this);
 		this.pilot = pilot;
-		this.sensor = sensor;
-		this.maxColorVal = maxColorVal;
 		this.detector = detector;
 	}
 
 	@Override
 	public boolean takeControl() {
+		if (detector.lineFound()) {
+			return true;
+		}
 		return true;
 	}
 
@@ -47,9 +37,9 @@ public class DriveForward implements Behavior, LineDetectorListener {
 					pilot.travel(-20);
 				} else if (detector.lineFound()) {
 					if (arc < 0) {
-						pilot.travelArc(-50, -10);
+						pilot.rotate(arc/2);
 					} else {
-						pilot.travelArc(50, -10);
+						pilot.rotate(arc/2);
 					}
 				}
 				
@@ -66,14 +56,6 @@ public class DriveForward implements Behavior, LineDetectorListener {
 	@Override
 	public void lineFound() {
 		// TODO Auto-generated method stub
-		LCD.drawString("found", 0, 0);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		arc = Motor.C.getTachoCount();
 	}
 
 }
