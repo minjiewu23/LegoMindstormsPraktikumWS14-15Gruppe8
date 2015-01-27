@@ -54,7 +54,7 @@ public class SensorTests implements ButtonListener{
 		} else if (Button.ESCAPE == b) {
 			buttonPressed = true;
 		}
-		
+	
 	}
 
 	@Override
