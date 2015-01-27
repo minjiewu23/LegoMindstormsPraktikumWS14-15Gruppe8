@@ -10,7 +10,7 @@ public class SensorTests {
 	
 	public static void rotateSensor() throws Exception {
 		NXTRegulatedMotor sensorMotor = Motor.C;
-		
+		//test change
 		//rotate Sensor To Positions (should be tested, which is the 0 Position)
 		sensorMotor.rotateTo(0);
 		Thread.sleep(1000);
