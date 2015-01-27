@@ -1,27 +1,50 @@
-import lejos.nxt.Motor;
-import lejos.nxt.NXTRegulatedMotor;
+import javax.microedition.sensor.SensorInfo;
+import javax.microedition.sensor.SensorListener;
+
+import lejos.nxt.Button;
+import lejos.nxt.ButtonListener;
+import lejos.nxt.LCD;
+import lejos.nxt.LightSensor;
+import lejos.nxt.SensorPort;
+import lejos.nxt.UltrasonicSensor;
 
 
-public class SensorTests {
+public class SensorTests implements ButtonListener{
+	public boolean buttonPressed = false;
 	
 	public static void main(String[] args) throws Exception {
-		SensorTests.rotateSensor();
+		SensorTests tests = new SensorTests();
+		
+		Button.ENTER.addButtonListener(tests);
+		Button.ESCAPE.addButtonListener(tests);
+		while (!tests.buttonPressed) {
+			Thread.sleep(100);
+		}
 	}
-	
-	public static void rotateSensor() throws Exception {
-		NXTRegulatedMotor sensorMotor = Motor.C;
-		
-		//rotate Sensor To Positions (should be tested, which is the 0 Position)
-		sensorMotor.rotateTo(0);
-		Thread.sleep(1000);
 
-		sensorMotor.rotateTo(90);
-		Thread.sleep(1000);
+	@Override
+	public void buttonPressed(Button b) {
+		LCD.drawString("Pressed", 0, 0);
+		if (b == Button.ENTER) {
+			UltrasonicSensor ultrasonic = new UltrasonicSensor(SensorPort.S2);
+			LightSensor lightSensor = new LightSensor(SensorPort.S1);
+			int ultra = ultrasonic.getDistance();
+			String ultraUnit = ultrasonic.getUnits();
+			int light = lightSensor.getLightValue();
+			int normalLight = lightSensor.getNormalizedLightValue();
+			LCD.refresh();
+			LCD.drawString("Ultrasonic: "+ultra+ultraUnit, 0, 0);
+			LCD.drawString("Light Value: "+light, 0, 1);
+			LCD.drawString("NormalizedLightValue"+normalLight, 0, 2);
+		} else if (Button.ESCAPE == b) {
+			buttonPressed = true;
+		}
 		
-		sensorMotor.rotateTo(180);
-		Thread.sleep(1000);
+	}
+
+	@Override
+	public void buttonReleased(Button b) {
+		// TODO Auto-generated method stub
 		
-		sensorMotor.rotateTo(270);
-		Thread.sleep(1000);
 	}
 }
