@@ -1,3 +1,4 @@
+import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
@@ -17,11 +18,11 @@ public class LineFollower {
 		OUTSIDE
 	};
 	
-	private int lineBorderLightValue = 40;
+	private int lineBorderLightValue = 35;
 	
 	private int lightOffset = 5;
 	
-	private int arcStep = 5;
+	private int arcStep = 2;
 	
 	private SIDE lineSide = SIDE.LEFT;
 	
@@ -35,7 +36,7 @@ public class LineFollower {
 
 	private LightSensor sensor;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		DifferentialPilot pilot = new DifferentialPilot(20, 100, Motor.A, Motor.B);
 		LightSensor sensor = new LightSensor(SensorPort.S1);
 		LineFollower follower = new LineFollower(pilot, sensor);
@@ -47,19 +48,26 @@ public class LineFollower {
 		this.sensor = sensor;
 	}
 	
-	public void startFollowing() {
+	public void startFollowing() throws InterruptedException {
+		this.stepLeft();
+		Thread.sleep(1000);
+		this.stepRight();
+		Thread.sleep(1000);
 		while (follow) {
+			LCD.refresh();
 			int lightValue = this.sensor.getLightValue() - lineBorderLightValue;
+			LCD.drawString("Val:"+this.sensor.getLightValue(), 0, 0);
 			boolean inside = true;
 			if (lightValue < 0 && highState == HIGH.INSIDE) {
 				inside = false;
 			} else if (lightValue > 0 && highState == HIGH.OUTSIDE) {
 					inside = false;
-				}
+			}
 			if (Math.abs(lightValue) < lightOffset) {
 				pilot.travel(-10);
 				this.pose = new Pose();
 			} else if (!inside) {
+				LCD.drawString("outside", 0, 1);
 				if (lineSide == SIDE.LEFT) {
 					this.stepRight();
 				}
@@ -67,11 +75,12 @@ public class LineFollower {
 					this.stepLeft();
 				}
 			} else {
+				LCD.drawString("inside", 0, 1);
 				if (lineSide == SIDE.LEFT) {
-					this.arcleft();
+					this.stepLeft();
 				}
 				if (lineSide == SIDE.RIGHT) {
-					this.arcRight();
+					this.stepRight();
 				}
 			}
 			if (pose.getHeading() > 90) {
@@ -85,11 +94,11 @@ public class LineFollower {
 	}
 	
 	private void arcRight() {
-		this.pilot.travelArc(30, 10);
+		this.pilot.travelArc(50, 300);
 	}
 	
 	private void arcleft() {
-		this.pilot.travelArc(-30, 10);
+		this.pilot.travelArc(500, -20);
 	}
 	
 	private void stepRight() {
