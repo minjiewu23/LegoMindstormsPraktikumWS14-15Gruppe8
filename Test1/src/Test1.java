@@ -1,5 +1,4 @@
 import lejos.nxt.Button;
-import lejos.nxt.ButtonListener;
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
@@ -19,69 +18,58 @@ import lejos.robotics.navigation.DifferentialPilot;
  */
 
 
-public class Test1 implements ButtonListener {
+public class Test1 {
 	
 	public boolean buttonPressed = false;
 	
 	public static void main (String args[]) throws Exception{
-		Test1 lego = new Test1();
+		//Test1 lego = new Test1();
 		DifferentialPilot pilot = new DifferentialPilot(20, 100, Motor.A, Motor.B, true);
 		UltrasonicSensor headsensor = new UltrasonicSensor(SensorPort.S2);
-		
-		for(int i=0; i<10; i++){
-			int angle = Motor.C.getTachoCount(); // should be -360
-			System.out.println(angle);
-			Motor.C.rotateTo(10);
-		}
-		
-		//Reset motor C
-		Motor.C.rotateTo(0);
+		int rotateSpeed = 200;
+		int rotateRobotRight = -113;
+		int rotateRobotLeft = 100;
 		//Show ready
 		System.out.println("Ready");
+		
+		Button.waitForAnyPress();
+		
 		//Go
-		//Lab: Left - Left - Right - Rigt - Left
-		while(headsensor.getDistance() > 30){
+		while(true){
+			while(headsensor.getDistance() > 30){
+				pilot.forward();
+				lookWall(headsensor, pilot);
+			}
+			pilot.stop();
+			Motor.C.rotate(-90); //Rotate Left
+			int distanceLeft = headsensor.getDistance(); //Left Wall
+			Motor.C.rotate(180); //Rotate null + Right (90 + 90)
+			int distanceRight = headsensor.getDistance(); //Right Wall
+			Motor.C.rotate(-90); //Rotate to null
+			
+			pilot.setRotateSpeed(rotateSpeed); //Rotate speed
+			//Go to the direction where is more distance to the next wall
+			if(distanceRight < distanceLeft) pilot.rotate(rotateRobotRight);
+			else pilot.rotate(rotateRobotLeft);
 			pilot.forward();
 		}
-		
-		while(headsensor.getDistance() < 30){
-			pilot.setRotateSpeed(10);
-			pilot.rotateLeft();
-		}
-		
-		while(headsensor.getDistance() > 30){
-			pilot.forward();
-		}
-	
-		
-		/*//Reset motor C
-		Motor.C.rotateTo(0);
-		//Show ready
-		System.out.println("Ready");
-		//Push boton to start
-		Button.ENTER.addButtonListener(lego);
-		//Distance
-		distance = headsensor.getDistance();
-		//Go
-		while(distance < 12){
-			pilot.setTravelSpeed(200);
-			pilot.travel(50);
-			distance = headsensor.getDistance();
-		}
-		//Wall? -> stop
-		pilot.stop();
-		//Right free? -> Right
-		//Right no free -> Left free? -> Left */
-	}
-		
-	@Override
-	public void buttonPressed(Button b) {
-		while(b != Button.ENTER);
 	}
 
-	@Override
-	public void buttonReleased(Button b) {
-		// TODO Auto-generated method stub
+	private static void lookWall(UltrasonicSensor headsensor, DifferentialPilot pilot) {
+		
+		Motor.C.rotate(-90); //Rotate Left
+		if(headsensor.getDistance() < 30){
+			//pilot.stop();
+			pilot.rotate(20); //Rotate Right
+		}
+		
+		Motor.C.rotate(180); //Rotate null + Right (90 + 90)
+		if(headsensor.getDistance() < 30){ //Right Wall
+			//pilot.stop();
+			pilot.rotate(-20); //Rotate Left
+		}
+		Motor.C.rotate(-90); //Rotate to null
+
 		
 	}
 }
