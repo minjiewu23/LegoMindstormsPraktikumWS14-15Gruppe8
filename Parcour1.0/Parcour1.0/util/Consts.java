@@ -2,6 +2,7 @@ import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 import lejos.nxt.SensorPort;
+import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 
@@ -25,13 +26,19 @@ public class Consts {
 	public static final SensorPort LEFT_TOUCH_SENSOR_PORT = SensorPort.S3;
 
 	public static final SensorPort RIGHT_TOUCH_SENSOR_PORT = SensorPort.S4;
+
+	public static final LightSensor LIGHT_SENSOR = new LightSensor(LIGHT_SENSOR_PORT);
+
+	public static final UltrasonicSensor ULTRASONIC_SENSOR = new UltrasonicSensor(ULTRASONIC_SENSOR_PORT);
+	
+	public static final TouchSensor TOUCH_SENSOR_LEFT = new TouchSensor(LEFT_TOUCH_SENSOR_PORT);
+
+	public static final TouchSensor TOUCH_SENSOR_RIGHT = new TouchSensor(RIGHT_TOUCH_SENSOR_PORT);
 	
 	/**
 	 * Sensors Define
 	 */
 	
-	public static final UltrasonicSensor ULTRASONIC_SENSOR = new UltrasonicSensor(ULTRASONIC_SENSOR_PORT);
-	public static final LightSensor LIGHT_SENSOR = new LightSensor(LIGHT_SENSOR_PORT);
 	public static final DifferentialPilot PILOT = new DifferentialPilot(20, 100, Motor.A, Motor.B, true);
 	
 	/**
