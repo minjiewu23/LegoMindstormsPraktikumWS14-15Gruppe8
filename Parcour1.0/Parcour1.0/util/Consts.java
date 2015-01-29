@@ -48,6 +48,10 @@ public class Consts {
 	public static final int LINE_SEPERATION_VALUE = 40;
 	
 	public static final int LINE_SEARCH_ARC = 2;
+	
+	public static final int LINE_BORDER_OFFSET = 5;
+	
+	public static final int LINE_MAX_PANS_WHILE_FOLLOWING = 3;
 
 	
 	/**

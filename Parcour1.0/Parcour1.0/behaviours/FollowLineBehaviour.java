@@ -11,6 +11,11 @@ public class FollowLineBehaviour implements Behavior{
 		NONE
 	}
 	
+	private enum PanDirection {
+		LEFT,
+		RIGHT
+	}
+	
 	private enum State {
 		//the Robot knows where the line is and is traveling along it
 		ONLINE,
@@ -24,7 +29,7 @@ public class FollowLineBehaviour implements Behavior{
 	/**
 	 * when the line is lost, the robot turns in one direction and then in the other
 	 * while trying to find the line again
-	 * if it was not able to find the line by turning in obe or the other direction
+	 * if it was not able to find the line by turning in oben or the other direction
 	 * the line did end
 	 */
 	private enum LineLostState {
@@ -39,20 +44,27 @@ public class FollowLineBehaviour implements Behavior{
 	
 	private LineLostState lineLostState = LineLostState.NOT_SEARCHED;
 	
+	private int pansInOneDirection = 0;
+	
+	private PanDirection lastPanDiretion = PanDirection.LEFT; 
+	
 	private ContinuousPilot pilot;
 	
 	private NXTRegulatedMotor sensorMotor;
 	
 	private LightSensor lightSensor;
 	
-	public FollowLineBehaviour(ContinuousPilot pilot, NXTRegulatedMotor sensorMotor, LightSensor lightSensor) {
+	public FollowLineBehaviour(ContinuousPilot pilot) {
 		this.pilot = pilot;
-		this.sensorMotor = sensorMotor;
-		this.lightSensor = lightSensor;
+		this.sensorMotor = Consts.SENSOR_MOTOR;
+		this.lightSensor = Consts.LIGHT_SENSOR;
 	}
 
 	@Override
 	public boolean takeControl() {
+		if (this.state == State.LINE_FINISHED) {
+			return false;
+		}
 		return true;
 	}
 
@@ -63,7 +75,72 @@ public class FollowLineBehaviour implements Behavior{
 		} else if (this.state == State.LINE_LOST) {
 			this.lineLost();
 		} else if (this.state == State.ONLINE) {
-			
+			this.followLine();
+		}
+	}
+	
+	public void followLine() {
+		int lightValue = lightSensor.getLightValue();
+		int diff = lightValue - Consts.LINE_SEPERATION_VALUE;
+		if (Math.abs(diff) < Consts.LINE_BORDER_OFFSET) {
+			pilot.forwardStep(2);
+		}
+		if (diff > 0) {
+			if (this.sideOfLine == LineSide.LEFT) {
+//				online
+				pilot.smallPanRight();
+//				when there are too much pans in one direction the line is lost
+				if (this.lastPanDiretion == PanDirection.RIGHT) {
+					this.pansInOneDirection++;
+					if (this.pansInOneDirection > Consts.LINE_MAX_PANS_WHILE_FOLLOWING) {
+						this.state = State.LINE_LOST;
+					}
+				} else {
+					this.lastPanDiretion = PanDirection.RIGHT;
+					this.pansInOneDirection = 0;
+				}
+			} else {
+//				offline
+				pilot.smallPanLeft();
+//				when there are too much pans in one direction the line is lost
+				if (this.lastPanDiretion == PanDirection.LEFT) {
+					this.pansInOneDirection++;
+					if (this.pansInOneDirection > Consts.LINE_MAX_PANS_WHILE_FOLLOWING) {
+						this.state = State.LINE_LOST;
+					}
+				} else {
+					this.lastPanDiretion = PanDirection.LEFT;
+					this.pansInOneDirection = 0;
+				}
+			}
+		} else {
+			if (this.sideOfLine == LineSide.RIGHT) {
+//				online
+				pilot.smallPanRight();
+//				when there are too much pans in one direction the line is lost
+				if (this.lastPanDiretion == PanDirection.RIGHT) {
+					this.pansInOneDirection++;
+					if (this.pansInOneDirection > Consts.LINE_MAX_PANS_WHILE_FOLLOWING) {
+						this.state = State.LINE_LOST;
+					}
+				} else {
+					this.lastPanDiretion = PanDirection.RIGHT;
+					this.pansInOneDirection = 0;
+				}
+			} else {
+//				offline
+				pilot.smallPanLeft();
+//				when there are too much pans in one direction the line is lost
+				if (this.lastPanDiretion == PanDirection.LEFT) {
+					this.pansInOneDirection++;
+					if (this.pansInOneDirection > Consts.LINE_MAX_PANS_WHILE_FOLLOWING) {
+						this.state = State.LINE_LOST;
+					}
+				} else {
+					this.lastPanDiretion = PanDirection.LEFT;
+					this.pansInOneDirection = 0;
+				}
+			}
 		}
 	}
 	
@@ -88,10 +165,14 @@ public class FollowLineBehaviour implements Behavior{
 //			in the first searching
 			if (this.sideOfLine == LineSide.LEFT) {
 				pilot.rotateLeft90();
-				searchLineLeft();
+				if (searchLineLeft()) {
+					this.state = State.ONLINE;
+				}
 			} else {
 				pilot.rotateRight90();
-				searchLineRight();
+				if (searchLineRight()) {
+					this.state = State.ONLINE;
+				}
 			}
 //			when the line has not be found in the first direction
 //			set search state
@@ -109,7 +190,6 @@ public class FollowLineBehaviour implements Behavior{
 		while (pilot.getHeadingSinceLastPoseReset() < 95) {
 			pilot.rotateLeftBy(Consts.LINE_SEARCH_ARC);
 			if (this.sensorSeesLine()) {
-				this.state = State.ONLINE;
 				this.sideOfLine = LineSide.RIGHT;
 				this.pilot.rotateRightBy(Consts.LINE_SEARCH_ARC);
 				return true;
@@ -123,7 +203,6 @@ public class FollowLineBehaviour implements Behavior{
 		while (pilot.getHeadingSinceLastPoseReset() > -95) {
 			pilot.rotateRightBy(Consts.LINE_SEARCH_ARC);
 			if (this.sensorSeesLine()) {
-				this.state = State.ONLINE;
 				this.sideOfLine = LineSide.LEFT;
 				this.pilot.rotateLeftBy(Consts.LINE_SEARCH_ARC);
 				return true;

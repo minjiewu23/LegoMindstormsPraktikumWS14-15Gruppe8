@@ -25,24 +25,14 @@ public class ContinuousPilot {
 	
 	private Pose pose;
 	
-	public static void main(String[] args) throws InterruptedException {
-//		ContinuousPilot.testTimeFor100(Motor.A, Motor.B);
-//		ContinuousPilot.testTimeFor360(Motor.A, Motor.B);
-		ContinuousPilot pilot = new ContinuousPilot(17.5, Motor.A, Motor.B);
-		pilot.setSpeed(5);
-		pilot.forward();
-		LCD.drawString(""+pilot.getHeadingSinceLastPoseReset(), 0, 0);
-		pilot.rotateLeft90();
-		LCD.drawString(""+pilot.getHeadingSinceLastPoseReset(), 0, 1);
-		pilot.rotateLeftBy(15);
-		LCD.drawString(""+pilot.getHeadingSinceLastPoseReset(), 0, 2);
-		pilot.rotateLeftBy(36);
-		LCD.drawString(""+pilot.getHeadingSinceLastPoseReset(), 0, 3);
-		pilot.rotateRightBy(16);
-		LCD.drawString(""+pilot.getHeadingSinceLastPoseReset(), 0, 4);
-		pilot.rotateLeftBy(20);
-		LCD.drawString(""+pilot.getHeadingSinceLastPoseReset(), 0, 5);
-		while(true){}
+	/**
+	 * performs as many steps fprward as specified
+	 * 1 step is one wheel turn
+	 */
+	public void forwardStep(float step) {
+		int turn = (int) step * 360;
+		leftMotor.rotate(turn, true);
+		rightMotor.rotate(turn);
 	}
 	
 	/**
