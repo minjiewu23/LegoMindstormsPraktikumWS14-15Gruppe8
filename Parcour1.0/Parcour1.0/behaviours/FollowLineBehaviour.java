@@ -17,12 +17,27 @@ public class FollowLineBehaviour implements Behavior{
 		//the Robot lost the line
 		LINE_LOST,
 		//no line has been found yet
-		NO_LINE
+		NO_LINE,
+		LINE_FINISHED
+	}
+	
+	/**
+	 * when the line is lost, the robot turns in one direction and then in the other
+	 * while trying to find the line again
+	 * if it was not able to find the line by turning in obe or the other direction
+	 * the line did end
+	 */
+	private enum LineLostState {
+		NOT_SEARCHED,
+		SEARCHED_FIRST_DIRECTION,
+		SEARCHED_SECOND_DIRECTION
 	}
 	
 	private LineSide sideOfLine = LineSide.NONE;
 	
 	private State state = State.NO_LINE;
+	
+	private LineLostState lineLostState = LineLostState.NOT_SEARCHED;
 	
 	private ContinuousPilot pilot;
 	
@@ -44,12 +59,77 @@ public class FollowLineBehaviour implements Behavior{
 	@Override
 	public void action() {
 		if (this.state == State.NO_LINE) {
-			
+			this.searchLineBeginning();
 		} else if (this.state == State.LINE_LOST) {
-			
+			this.lineLost();
 		} else if (this.state == State.ONLINE) {
 			
 		}
+	}
+	
+	public void lineLost() {
+		if (this.lineLostState == LineLostState.NOT_SEARCHED) {
+//			start to search the line in the directino it should be 
+//			(turn right when the robot is following the left line side and vice versa)
+			if (this.sideOfLine == LineSide.LEFT) {
+				searchLineRight();
+			} else {
+				searchLineLeft();
+			}
+//			when the line has not be found in the first direction
+//			set search state
+			if (this.state == State.LINE_LOST) {
+				this.lineLostState = LineLostState.SEARCHED_FIRST_DIRECTION;
+			}
+		} else if (this.lineLostState == LineLostState.SEARCHED_FIRST_DIRECTION) {
+//			start to search the line in the directino it should'nt be 
+//			(turn left when the robot is following the left line side and vice versa)
+//			but first rotate to the point where searching for the lane did start 
+//			in the first searching
+			if (this.sideOfLine == LineSide.LEFT) {
+				pilot.rotateLeft90();
+				searchLineLeft();
+			} else {
+				pilot.rotateRight90();
+				searchLineRight();
+			}
+//			when the line has not be found in the first direction
+//			set search state
+			if (this.state == State.LINE_LOST) {
+				this.lineLostState = LineLostState.SEARCHED_SECOND_DIRECTION;
+			}
+		} else if (this.lineLostState == LineLostState.SEARCHED_SECOND_DIRECTION) {
+//			assume that there is no line
+			this.state = State.LINE_FINISHED;
+		}
+	}
+	
+	public boolean searchLineLeft() {
+		pilot.resetPose();
+		while (pilot.getHeadingSinceLastPoseReset() < 95) {
+			pilot.rotateLeftBy(Consts.LINE_SEARCH_ARC);
+			if (this.sensorSeesLine()) {
+				this.state = State.ONLINE;
+				this.sideOfLine = LineSide.RIGHT;
+				this.pilot.rotateRightBy(Consts.LINE_SEARCH_ARC);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean searchLineRight() {
+		pilot.resetPose();
+		while (pilot.getHeadingSinceLastPoseReset() > -95) {
+			pilot.rotateRightBy(Consts.LINE_SEARCH_ARC);
+			if (this.sensorSeesLine()) {
+				this.state = State.ONLINE;
+				this.sideOfLine = LineSide.LEFT;
+				this.pilot.rotateLeftBy(Consts.LINE_SEARCH_ARC);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void searchLineBeginning() {
@@ -65,11 +145,11 @@ public class FollowLineBehaviour implements Behavior{
 				 * and rotate a bit to the other side to ensure that the robot is on the other side 
 				 */
 				if (arc > 0) {
-					this.pilot.rotateRightBy(2);
+					this.pilot.rotateRightBy(Consts.LINE_SEARCH_ARC);
 					this.sideOfLine = LineSide.LEFT;
 				} else {
 					this.sideOfLine = LineSide.RIGHT;
-					this.pilot.rotateLeftBy(2);
+					this.pilot.rotateLeftBy(Consts.LINE_SEARCH_ARC);
 				}
 				sensorMotor.rotateTo(0);
 			}
@@ -87,7 +167,6 @@ public class FollowLineBehaviour implements Behavior{
 
 	@Override
 	public void suppress() {
-		// TODO Auto-generated method stub
 		
 	}
 
