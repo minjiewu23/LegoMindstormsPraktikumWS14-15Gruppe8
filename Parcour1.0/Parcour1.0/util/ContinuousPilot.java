@@ -29,8 +29,9 @@ public class ContinuousPilot {
 	 * performs as many steps fprward as specified
 	 * 1 step is one wheel turn
 	 */
-	public void forwardStep(float step) {
-		int turn = (int) step * 360;
+	public void forwardStep(double d) {
+		int turn = (int) (d * 360);
+		LCD.drawInt(turn, 5, 5);
 		leftMotor.rotate(turn, true);
 		rightMotor.rotate(turn);
 	}
@@ -84,18 +85,26 @@ public class ContinuousPilot {
 		this.speedRight = (int) ((timeFor100Right * defaultSpeed) / speed);
 	}
 	
+	public int getSpeedLeft() {
+		return speedLeft;
+	}
+	
+	public int getSpeedRight() {
+		return speedRight;
+	}
+	
 	public void forward() {
 		leftMotor.setSpeed(this.speedLeft);
 		rightMotor.setSpeed(this.speedRight);
-		leftMotor.backward();
-		rightMotor.backward();
+		leftMotor.forward();
+		rightMotor.forward();
 	}
 	
 	public void backward() {
 		leftMotor.setSpeed(this.speedLeft);
 		rightMotor.setSpeed(this.speedRight);
-		leftMotor.forward();
-		rightMotor.forward();
+		leftMotor.backward();
+		rightMotor.backward();
 	}
 	
 	public void stop() {
@@ -119,8 +128,8 @@ public class ContinuousPilot {
 		rightMotor.stop();
 		int deg = motorRotation(degree);
 		this.pose.rotateUpdate(degree);
-		rightMotor.rotate((int) -deg, true);
-		leftMotor.rotate((int) deg);
+		rightMotor.rotate((int) deg, true);
+		leftMotor.rotate((int) -deg);
 	}
 	
 	public void rotateRightBy(int degree) {
@@ -128,8 +137,8 @@ public class ContinuousPilot {
 		rightMotor.stop();
 		int deg = motorRotation(degree);
 		this.pose.rotateUpdate(-degree);
-		rightMotor.rotate((int) deg, true);
-		leftMotor.rotate((int) -deg);
+		rightMotor.rotate((int) -deg, true);
+		leftMotor.rotate((int) deg);
 	}
 	
 	public void rotateLeft90() {
@@ -149,25 +158,27 @@ public class ContinuousPilot {
 	}
 	
 	public void smallPanLeft() {
+		this.forward();
 		leftMotor.stop();
 		try {
-			Thread.sleep((int) (100));
+			Thread.sleep((int) (150));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.forward();
+		this.stop();
 	}
 	
 	public void smallPanRight() {
+		this.forward();
 		rightMotor.stop();
 		try {
-			Thread.sleep((int) (100));
+			Thread.sleep((int) (150));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.forward();
+		this.stop();
 	}
 	
 	public static void testTimeFor100(NXTRegulatedMotor left, NXTRegulatedMotor right) {

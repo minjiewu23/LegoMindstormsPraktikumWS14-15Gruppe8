@@ -45,14 +45,25 @@ public class Consts {
 	 * LineFollower Constants
 	 */
 	
-	public static final int LINE_SEPERATION_VALUE = 40;
+	public static final int LINE_SEPERATION_VALUE = 35;
 	
-	public static final int LINE_SEARCH_ARC = 2;
+	public static final int LINE_SEARCH_ARC_ROBOT = 10;
+	
+	public static final int LINE_SEARCH_ARC_ROBOT_ARM = 10;
 	
 	public static final int LINE_BORDER_OFFSET = 5;
 	
-	public static final int LINE_MAX_PANS_WHILE_FOLLOWING = 3;
+	public static final int LINE_MAX_FAST_PANS_WHILE_FOLLOWING = 1;
+	
+	public static final int LINE_MAX_SLOW_PANS_WHILE_FOLLOWING = 2;
+	
+	public static final int LINE_MAX_SLOW_ROTATIONS_WHILE_FOLLOWING = 4;
+	
+	public static final int LINE_PAN_TIME = 100;
 
+	public static final int SENSOR_MOTOR_LEFT = 90;
+
+	public static final int SENSOR_MOTOR_RIGHT = -90;
 	
 	/**
 	 * BridgeRider Constants
