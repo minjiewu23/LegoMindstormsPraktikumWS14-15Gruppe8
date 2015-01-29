@@ -61,6 +61,16 @@ public class Consts {
 	public static final int BRIDGE_SEPERATION_VALUE = 30;
 	
 	public static final int BRIDGE_SEARCH_ARC = 4;
+	
+	public static final float BRIDGE_STEPS_FORWARD_WHILE_SEARCHING_BRIDGE = 2;
+	
+	public static final int BRIDGE_SEARCH_MOTOR_POSITION_RIGHT = -90;
+	
+	public static final int BRIDGE_SEARCH_MOTOR_POSITION_LEFT = 90;
+	
+	public static final int BRIDGE_EDGE_OFFSET = 2;
+	
+	public static final int BRIDGE_MAX_PANS_WHILE_FOLLOWING = 1;
 
 	private Consts() {
 		throw new AssertionError();

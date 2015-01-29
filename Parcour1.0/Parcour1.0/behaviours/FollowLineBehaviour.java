@@ -246,7 +246,7 @@ public class FollowLineBehaviour implements Behavior{
 
 	@Override
 	public void suppress() {
-		
+		sensorMotor.rotateTo(0);
 	}
 
 }
