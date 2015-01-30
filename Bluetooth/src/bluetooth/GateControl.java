@@ -63,21 +63,3 @@ public class GateControl {
 		return successful;
 	}
 
-	/**
-	 * Tells the brick to turn the gate.
-	 * @return true if the command was sent, false otherwise
-	 */
-	public boolean turnClockwise(int angle) {
-		return sendCommand(angle);
-	}
-	
-	public boolean sendCommand(int command) {
-		try {
-			outputStream.writeInt(command);
-			outputStream.flush();
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
-	}
-}
