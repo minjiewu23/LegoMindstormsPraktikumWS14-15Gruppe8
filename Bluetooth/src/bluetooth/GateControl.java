@@ -63,7 +63,6 @@ public class GateControl {
 			connection.close();
 		return successful;
 	}
-
 	/**
 	 * Tells the brick to open the gate.
 	 * @return true if the command to open the gate was sent, false otherwise
@@ -81,4 +80,5 @@ public class GateControl {
 			return false;
 		}
 	}
-}
+	
+ }
