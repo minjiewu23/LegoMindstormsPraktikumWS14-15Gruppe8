@@ -47,7 +47,7 @@ public class Consts {
 	
 	public static final int LINE_SEPERATION_VALUE = 35;
 	
-	public static final int LINE_SEARCH_ARC_ROBOT = 10;
+	public static final int LINE_SEARCH_ARC_ROBOT = 4;
 	
 	public static final int LINE_SEARCH_ARC_ROBOT_ARM = 10;
 	
@@ -64,6 +64,8 @@ public class Consts {
 	public static final int SENSOR_MOTOR_LEFT = 90;
 
 	public static final int SENSOR_MOTOR_RIGHT = -90;
+	
+	public static final int MAX_SEARCH_ARC = 120;
 	
 	/**
 	 * BridgeRider Constants
