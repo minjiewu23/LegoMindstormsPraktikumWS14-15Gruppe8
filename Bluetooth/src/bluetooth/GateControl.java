@@ -21,6 +21,7 @@ public class GateControl {
 	private BTConnection connection;
 	private DataInputStream inputStream;
 	private DataOutputStream outputStream;
+	private int connectedGate = 0;
 
 	/**
 	 * Connects to the brick that controls the gate.
@@ -64,14 +65,14 @@ public class GateControl {
 	}
 
 	/**
-	 * Tells the brick to turn the gate.
-	 * @return true if the command was sent, false otherwise
+	 * Tells the brick to open the gate.
+	 * @return true if the command to open the gate was sent, false otherwise
 	 */
-	public boolean turnClockwise(int angle) {
-		return sendCommand(angle);
+	public boolean openGate() {
+		return sendCommand(connectedGate);
 	}
 	
-	public boolean sendCommand(int command) {
+	private boolean sendCommand(int command) {
 		try {
 			outputStream.writeInt(command);
 			outputStream.flush();
